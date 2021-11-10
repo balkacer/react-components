@@ -89,18 +89,19 @@ const Select = ({
   // add selected option to list
   const addToSelects = (option) => {
     setSearch("");
-    // if option is in selects, remove it
     if (selects.includes(option)) {
+      // if option is already selected
       removeFromSelects(option);
     } else {
-      // if is multi-select add to selects
       if (isMulti) {
+        // if is multi-select
         setSelects((prev) =>
           prev.length < limit && !prev.includes(option) // if list length is < than limit and option isn't in list add to selects
             ? [...prev, option]
             : prev
         );
-      } else { // if is single-select, clear selects and add option
+      } else {
+        // if is single-select, clear selects and add option
         setSelects([option]);
       }
     }
@@ -109,6 +110,7 @@ const Select = ({
   // detect backspace key and remove last selected option
   const handleBackspace = (e) => {
     if (e.which === 8 && !search && selects.length > 0) {
+      // if backspace key and no search and selects length > 0
       removeFromSelects(selects[selects.length - 1]);
     }
   };
@@ -118,14 +120,15 @@ const Select = ({
     return [...str].filter((item, pos, self) => self.indexOf(item) === pos);
   };
 
-  // filter options by search whit powers!!
+  // filter options by search whit powers (Fuzzy Search)!!
   const getMatchAnyCharacter = (search = "", evaluated = "") => {
     const cleanSearch = removeDuplicatesFromString(search.toLowerCase());
-    const formattedEvaluated = (""+evaluated).toLowerCase();
+    const formattedEvaluated = ("" + evaluated).toLowerCase();
 
     let matches = [];
     [...cleanSearch].forEach((char) => {
       if (formattedEvaluated.includes(char) && !matches.includes(char))
+        // if char is in evaluated and not in matches add to matches
         matches.push(char);
     });
     return { isMatch: matches.length === cleanSearch.length, matches };
@@ -138,71 +141,68 @@ const Select = ({
 
   // filter options by search
   const getOptionsList = () => {
-    let _matches = [];
-
-    const optionsList = options
+    // render options list
+    return options
       .filter((option) => {
-        const { isMatch, matches } = getMatchAnyCharacter(
-          search,
-          option[keys.label]
-        );
-
-        if (isMatch) _matches = matches;
-
-        return isMatch || !search;
+        // filter not selected options
+        return !search && (withCheckBox || !isMulti)
+          ? option
+          : !selects.includes(option);
       })
-      .filter(option => { // filter by selected options
-        return !search && (withCheckBox || !isMulti) ? option : !selects.includes(option);
-      });
-
-    // render options list or options list with matches
-    return optionsList.map((option, i) => {
-      return (
-        <li
-          key={option[keys.key]}
-          className={`cursor-pointer flex flex-row justify-between items-center${
-            i === 0 ? "" : " border-t-2"
-          }`}
-          onClick={() => addToSelects(option)}
-        >
-          <span
-            className={`p-0 ${selects.includes(option) ? "font-bold" : ""}`}
+      .filter((option) => {
+        // filter options by match with search or all options if search is empty
+        return (
+          getMatchAnyCharacter(search, option[keys.label]).isMatch || !search
+        );
+      })
+      .map((option, i) => {
+        return (
+          <li
+            key={option[keys.key]}
+            className={`cursor-pointer flex flex-row justify-between items-center pointer-events-auto${
+              i === 0 ? "" : " border-t-2"
+            }`}
+            onClick={() => addToSelects(option)}
           >
-            {[...("" + option[keys.label])].map((char, index) => {
-              // if is match char, add class to highlight
-              return _matches.includes(char.toLowerCase()) ? (
-                <span key={index} className="font-bold text-info">
-                  {char}
-                </span>
-              ) : (
-                <span key={index}>{char}</span>
-              );
-            })}
-          </span>
-          {withCheckBox && isMulti && ( // if is multi-select and with checkbox render checkbox
-            <input
-              type="checkbox"
-              className="checkbox input-info mr-4"
-              checked={selects.includes(option)}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  addToSelects(option); // if checkbox is checked add to selects
-                } else {
-                  removeFromSelects(option); // if checkbox is unchecked remove from selects
-                }
-              }}
-            />
-          )}
-        </li>
-      );
-    });
+            <span
+              className={`p-0 ${selects.includes(option) ? "font-bold" : ""}`}
+            >
+              {[...("" + option[keys.label])].map((char, index) => {
+                // if is match char, add class to highlight
+                return search.includes(char.toLowerCase()) ? (
+                  <span key={index} className="font-bold text-info">
+                    {char}
+                  </span>
+                ) : (
+                  <span key={index}>{char}</span>
+                );
+              })}
+            </span>
+            {withCheckBox &&
+              isMulti && ( // if is multi-select and with checkbox render checkbox
+                <input
+                  type="checkbox"
+                  className="checkbox input-info mr-4"
+                  checked={selects.includes(option)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      addToSelects(option); // if checkbox is checked add to selects
+                    } else {
+                      removeFromSelects(option); // if checkbox is unchecked remove from selects
+                    }
+                  }}
+                />
+              )}
+          </li>
+        );
+      });
   };
 
   return (
     <div
       className="form-group h-auto flex flex-col relative"
       style={{ width: width || "100%" }}
-      onClick={() => setIsFocus(true)}
+      onClick={() => setIsFocus(true)} // set focus on input when click on component
     >
       <label className="label font-bold" htmlFor={id}>
         <span className="label-text">{label}</span>
@@ -210,31 +210,32 @@ const Select = ({
       </label>
       <div
         className={`rounded-box w-full h-12 p-3 pr-12 border-2 flex flex-row items-center${
-          " " + className
+          " " + className // add custom className if is passed
         }`}
-        onClick={() => setIsFocus(true)}
+        onClick={() => setIsFocus(true)} // set focus on input when click on component
       >
-        {selects.length > 0 && !withCheckBox && isMulti && (
-          <div
-            className="flex flex-row items-center w-auto h-auto"
-            style={{ maxWidth: "" }}
-            contentEditable={false}
-          >
-            {selects.map((selected) => (
-              <div
-                key={selected[keys.key]}
-                className="badge badge-info p-0 py-2 px-4 mr-2 h-full rounded-lg"
-                onClick={() => {
-                  removeFromSelects(selected);
-                }}
-              >
-                {selected[keys.label]}
-              </div>
-            ))}
-          </div>
-        )}
+        {selects.length > 0 &&
+          !withCheckBox &&
+          isMulti && ( // if is multi-select and with checkbox render selected options
+            <div
+              className="flex flex-row items-center w-auto h-auto"
+              style={{ maxWidth: "" }}
+            >
+              {selects.map((selected) => (
+                <div
+                  key={selected[keys.key]}
+                  className="badge badge-info p-0 py-2 px-4 mr-2 h-full rounded-lg"
+                  onClick={() => {
+                    removeFromSelects(selected);
+                  }}
+                >
+                  {selected[keys.label]}
+                </div>
+              ))}
+            </div>
+          )}
         {!isMulti &&
-          selects.length > 0 &&
+          selects.length > 0 && // if is single-select and has selected option render selected option
           selects.map((selected) => (
             <span key={selected[keys.key]}>{selected[keys.label]}</span>
           ))}
@@ -242,55 +243,55 @@ const Select = ({
           <input
             type="text"
             className="border-o focus:outline-none h-full"
-            ref={searchInput}
+            ref={searchInput} // connect input to ref
             placeholder={placeholder}
             value={search}
-            readOnly={!isFocus}
-            // onBlur={() => setIsFocus(false)}
+            readOnly={!isFocus || selects.length === limit} // if is not focus and has limit selected options, readonly input
+            // onBlur={() => setIsFocus(false)} // set focus off when blur
             onChange={handleSearch}
-            onKeyDown={handleBackspace}
+            onKeyDown={handleBackspace} // detect backspace key and remove last selected option
           />
         )}
-        {isClearable && (selects.length || search) && (
-          <button
-            className="btn btn-circle btn-ghost p-0 h-8 max-h-8 min-h-8 w-8 absolute right-4"
-            onClick={() => clearSelects()}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="inline-block w-4 h-4 stroke-current"
+        {isClearable &&
+          (selects.length || search) && ( // if is clearable and has selected or search options render clear button
+            <button
+              className="btn btn-circle btn-ghost btn-info p-0 h-6 max-h-6 min-h-6 w-6 absolute right-4"
+              onClick={() => clearSelects()} // clear selects
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-          </button>
-        )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="inline-block w-4 h-4 stroke-current"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          )}
       </div>
-      {isFocus && (
+      {isFocus && ( // if is focus render options list
         <ul
           className="menu rounded-box absolute top-full mt-4 border-2 w-full select-menu"
-          onClick={() => setIsFocus(false)}
           style={{
             maxHeight: maxListHeight,
             overflowY: "auto",
           }}
         >
-          {isLoading ? (
-            <div className="text-center">
-              <div className="spinner"></div>
+          {isLoading ? ( // if is loading render loading
+            <div class="flex justify-center items-center m-5">
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-info"></div>
             </div>
-          ) : getOptionsList().length > 0 ? (
+          ) : getOptionsList().length > 0 ? ( // if has options render options list else render not found message
             getOptionsList()
           ) : (
             <li className="flex items-center">
               <span className="p-0">
-                <span className="font-light italic">Nothing match</span>
+                <span className="font-light italic">No options left...</span>
               </span>
             </li>
           )}
@@ -301,21 +302,21 @@ const Select = ({
 };
 
 Select.propTypes = {
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  options: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-  keys: PropTypes.object.isRequired,
-  placeholder: PropTypes.string,
-  className: PropTypes.string,
-  width: PropTypes.string,
-  isClearable: PropTypes.bool,
-  setSelected: PropTypes.object,
-  selectsLimit: PropTypes.number,
-  isMulti: PropTypes.bool,
-  isRequired: PropTypes.bool,
-  isSearchable: PropTypes.bool,
-  whitCheckBox: PropTypes.bool,
+  id: PropTypes.string.isRequired, // id of select
+  label: PropTypes.string.isRequired, // label of select
+  options: PropTypes.array.isRequired, // options of select
+  onChange: PropTypes.func.isRequired, // onChange function
+  keys: PropTypes.object.isRequired, // keys of options
+  placeholder: PropTypes.string, // placeholder of select
+  className: PropTypes.string, // custom className
+  width: PropTypes.string, // custom width
+  isClearable: PropTypes.bool, // if is clearable
+  setSelected: PropTypes.object, // set default selected option
+  selectsLimit: PropTypes.number, // limit of selects
+  isMulti: PropTypes.bool, // if is multi-select
+  isRequired: PropTypes.bool, // if is required
+  isSearchable: PropTypes.bool, // if is searchable
+  whitCheckBox: PropTypes.bool, // if is multi-select with checkbox
 };
 
 export default Select;

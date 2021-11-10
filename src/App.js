@@ -29,6 +29,14 @@ const selectConfig = {
   setSelected: options[2],
   selectsLimit: 3,
   width: "300px",
+  isLoading: false,
+  placeholder: "Search...",
+  className: "",
+  isClearable: true,
+  isRequired: false,
+  isSearchable: true,
+  isDisabled: false,
+  maxListHeight: "300px",
 };
 
 function App() {
