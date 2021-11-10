@@ -122,7 +122,7 @@ const Select = ({
     return [...str].filter((item, pos, self) => self.indexOf(item) === pos);
   };
 
-  // filter options by search whit powers (Fuzzy Search)!!
+  // filter options by search with powers (Fuzzy Search)!!
   const getMatchAnyCharacter = (search = "", evaluated = "") => {
     const cleanSearch = removeDuplicatesFromString(search.toLowerCase());
     const formattedEvaluated = ("" + evaluated).toLowerCase();
