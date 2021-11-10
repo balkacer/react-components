@@ -48,30 +48,32 @@ const Select = ({
 
   // Send selected options to parent
   useEffect(() => {
-    // if is required and no options selected or is not required
     if (!isRequired || (isRequired && !!selects)) {
-      // get and process value options to return
+      // if is required and has selected options or is not required
       if (typeof keys.value === "string" && !!keys.value) {
+        // if value is string
         onChange(selects.map((item) => item[keys.value]));
       } else if (Array.isArray(keys.value) && !!keys.value) {
-        onChange(selects.map((item) => pickProperties(item, keys.value)));
+        // if value is array
+        onChange(selects.map((item) => selectPropsFromObj(item, keys.value)));
       } else if (typeof keys.value === "function" && !!keys.value) {
+        // if value is function
         onChange(selects.map((item) => keys.value(item)));
       } else {
+        // if value is not defined or is not string or array
         throw new Error("Invalid value key");
       }
     }
     setIsFocus(true);
   }, [selects]); // eslint-disable-line
 
-  // pick properties from object
-  const pickProperties = (obj, keys) => {
-    return Object.keys(obj).reduce((acc, key) => {
-      if (keys.includes(key)) {
-        acc[key] = obj[key];
-      }
-      return acc;
-    }, {});
+  // select properties to return
+  const selectPropsFromObj = (obj, props) => {
+    const newObj = {};
+    for (let key of props) {
+      if (obj.hasOwnProperty(key)) newObj[key] = obj[key];
+    }
+    return newObj;
   };
 
   // remove selected option from list
@@ -274,9 +276,11 @@ const Select = ({
             </button>
           )}
       </div>
-      {(isFocus && !!selectsLimit) && (<label class="label">
-        <span class="label-text-alt italic">Limit: {limit}</span> 
-      </label>)}
+      {isFocus && !!selectsLimit && (
+        <label class="label">
+          <span class="label-text-alt italic">Limit: {limit}</span>
+        </label>
+      )}
       {isFocus && ( // if is focus render options list
         <ul
           className="menu rounded-box absolute top-full mt-1 border-2 w-full select-menu"
