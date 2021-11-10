@@ -323,7 +323,7 @@ Select.propTypes = {
   isMulti: PropTypes.bool, // if is multi-select
   isRequired: PropTypes.bool, // if is required
   isSearchable: PropTypes.bool, // if is searchable
-  whitCheckBox: PropTypes.bool, // if is multi-select with checkbox
+  withCheckBox: PropTypes.bool, // if is multi-select with checkbox
 };
 
 export default Select;
