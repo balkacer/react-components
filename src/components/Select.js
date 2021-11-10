@@ -274,9 +274,12 @@ const Select = ({
             </button>
           )}
       </div>
+      {(isFocus && !!selectsLimit) && (<label class="label">
+        <span class="label-text-alt italic">Limit: {limit}</span> 
+      </label>)}
       {isFocus && ( // if is focus render options list
         <ul
-          className="menu rounded-box absolute top-full mt-4 border-2 w-full select-menu"
+          className="menu rounded-box absolute top-full mt-1 border-2 w-full select-menu"
           style={{
             maxHeight: maxListHeight,
             overflowY: "auto",
