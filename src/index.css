@@ -1,6 +1,6 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; /* eslint-ignore-line */
 
 div:empty:before {
   content: attr(data-placeholder);
@@ -29,4 +29,21 @@ div:empty:before {
   border: 5px solid transparent;
   border-radius: 100px;
   background-clip: padding-box;
+}
+
+.tag-reel {
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 7px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tag-reel::-webkit-scrollbar {
+  display: none;
 }

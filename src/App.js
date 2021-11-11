@@ -1,41 +1,36 @@
 import "tailwindcss/tailwind.css";
 import Select from "./components/Select";
+import { generateRandomData } from "./utils/random";
 
-const options = [
-  { id: 1, age: 23, isMale: true, name: "Enmanuel" },
-  { id: 2, age: 20, isMale: true, name: "Juan" },
-  { id: 3, age: 25, isMale: false, name: "Jasmine" },
-  { id: 4, age: 21, isMale: false, name: "Maria" },
-  { id: 5, age: 14, isMale: true, name: "Tomas" },
-  { id: 6, age: 21, isMale: true, name: "Miguel" },
-  { id: 7, age: 42, isMale: true, name: "Carlos" },
-  { id: 8, age: 30, isMale: false, name: "Rosy" },
-];
+const options = [];
+
+for (let i = 1; i <= 100; i++) {
+  options.push({ id: i, ...generateRandomData() });
+}
 
 const keys = {
   key: "id",
-  label: "name",
-  value: (item) => item.name + " is " + item.age + " years old",
+  label: "fullName",
+  value: (item) => item.fullName + " - " + item.email + " - " + item.phone,
 };
 
 const selectConfig = {
   options,
   label: "Employee",
   id: "select",
-  onChange: (value) => console.log(value),
+  onChange: (value) => {console.clear(); console.log(value)},
   keys: keys,
   isMulti: true,
-  withCheckBox: true,
-  setSelected: options[2],
-  selectsLimit: 3,
-  width: "300px",
+  withCheckBox: false,
+  defaultSelected: null,
+  selectsLimit: 5,
+  width: "500px",
   isLoading: false,
   placeholder: "Search...",
   className: "",
   isClearable: true,
   isRequired: false,
   isSearchable: true,
-  isDisabled: false,
   maxListHeight: "300px",
 };
 
